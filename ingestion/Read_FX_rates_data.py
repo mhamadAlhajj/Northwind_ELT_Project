@@ -28,7 +28,7 @@ def run_pipeline():
     print("🚀 Starting FX_rates data extraction...")
     pipeline = dlt.pipeline(
         pipeline_name="FX_pipeline",
-        destination=dlt.destinations.duckdb("warehouse/duckdb"),
+        destination=dlt.destinations.duckdb("warehouse/northwind.duckdb"),
         dataset_name="raw",
     )
 

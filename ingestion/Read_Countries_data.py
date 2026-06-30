@@ -46,7 +46,7 @@ def run_pipeline():
     print("🚀 Starting Countries data extraction...")
     pipeline = dlt.pipeline(
         pipeline_name="Countries_pipeline",
-        destination=dlt.destinations.duckdb("warehouse/duckdb"),
+        destination=dlt.destinations.duckdb("warehouse/northwind.duckdb"),
         dataset_name="raw",
     )
 
