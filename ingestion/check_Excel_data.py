@@ -1,28 +1,14 @@
 from pathlib import Path
 import pandas as pd
-import requests
-from dotenv import load_dotenv
-import os
-load_dotenv()
-api_key= os.getenv("api_key")
+
 from sqlglot.expressions import Count
 Raw_xlsx = Path("Sources/raw_sales_export.xlsx")
 Raw_xlsx_2 = Path("Sources/raw_sales_export_v2.xlsx")
 DUCKDB     = Path("warehouse/northwind.duckdb")
-FX_BASE    = "https://api.frankfurter.dev/v2/rates"
-COUNTRIES  = "https://restcountries.com/countries/v5"
+
 
 def load_Data(path , skip_rows = 0) -> pd.DataFrame:
         return pd.read_excel(path , skiprows=skip_rows)          
-
-FX_response = requests.get(FX_BASE)
-if FX_response.status_code == 200 :
-    FX_Data = FX_response.json()
-
-params = {"api_key":api_key }
-Countries_response =  requests.get(COUNTRIES , params=params)
-if Countries_response.status_code == 200 :
-    Countries_Data = Countries_response.json()
 
 def data_overview(Data):
     print("first 5 rows of data:")
@@ -64,7 +50,7 @@ def check_Column(Data):
 
 df_raw = load_Data(Raw_xlsx ,3)
 df_raw_2 = load_Data(Raw_xlsx_2  , 3)
-# data_overview(df_raw)
-# data_overview(df_raw_2)
-# check_Column(df_raw)
-# check_Column(df_raw_2)
+data_overview(df_raw)
+data_overview(df_raw_2)
+check_Column(df_raw)
+check_Column(df_raw_2)
