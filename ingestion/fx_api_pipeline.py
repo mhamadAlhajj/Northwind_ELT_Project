@@ -13,7 +13,8 @@ def Read_FX(path):
                 "name" : "FX_Rates",
                 "endpoint":{
                     "path":"v2/rates",
-                "paginator": {
+                    "params":{"base":"USD"},
+                    "paginator": {
                     "type": "single_page",
                 }
                 }
