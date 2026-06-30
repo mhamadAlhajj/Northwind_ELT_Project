@@ -25,7 +25,7 @@ def Read_Countries(path):
                     "path":"countries/v5",
                     "data_selector": "data.objects",
                 "params": {
-                    "response_fields": "names.common,names.official,region,area,continents,coordinates,currencies,population",
+                    "response_fields": "names.common,names.official,region,area,continents,coordinates,currencies,population,ISO",
                 },
                 "paginator": {
                     "type": "offset",
