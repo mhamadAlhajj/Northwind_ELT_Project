@@ -2,7 +2,6 @@ from dotenv import load_dotenv
 import os
 import dlt
 from dlt.sources.rest_api import rest_api_source
-import requests
 
 load_dotenv()
 api_key= os.getenv("api_key")

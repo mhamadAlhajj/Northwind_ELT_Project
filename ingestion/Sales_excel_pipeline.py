@@ -20,7 +20,7 @@ def fix_mojibake(value):
 
 @dlt.resource(name="sales", write_disposition="merge", primary_key=["Order ID"])
 def load_data(path, skip_rows=0):
-    df = pd.read_excel(path, skiprows=skip_rows)
+    df = pd.read_excel(path, skiprows=skip_rows,dtype=str)
     df.columns = df.columns.str.strip()
     df = df.rename(columns={"Total Amount": "Amount"})
     df = df.dropna(subset=["Order ID"])
