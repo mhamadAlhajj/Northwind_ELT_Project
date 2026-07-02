@@ -26,3 +26,33 @@ Happy modeling!
 [0m17:30:49.563150 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000017287E09940>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000017287E7E210>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000017287D359D0>]}
 [0m17:30:49.563780 [debug] [MainThread]: Flushing usage events
 [0m17:30:50.934718 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m10:58:42.100154 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021D0EACC5C0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021D0F56A6F0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021D0F56B8F0>]}
+
+
+============================== 10:58:42.105190 | d5ca7a2e-056c-4f38-bb59-2ff94f84dafc ==============================
+[0m10:58:42.105190 [info ] [MainThread]: Running with dbt=1.11.12
+[0m10:58:42.107155 [debug] [MainThread]: running dbt with arguments {'version_check': 'True', 'no_print': 'None', 'static_parser': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'target_path': 'None', 'printer_width': '80', 'write_json': 'True', 'introspect': 'True', 'log_cache_events': 'False', 'empty': 'None', 'cache_selected_only': 'False', 'log_format': 'default', 'debug': 'False', 'fail_fast': 'False', 'profiles_dir': 'C:\\Users\\DELL\\.dbt', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'partial_parse': 'True', 'use_colors': 'True', 'invocation_command': 'dbt show --select stg_sales', 'indirect_selection': 'eager', 'use_experimental_parser': 'False', 'log_path': 'logs'}
+[0m10:58:42.107155 [error] [MainThread]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path C:\Users\DELL\Desktop\python\ETL_Project_git\dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m10:58:42.110182 [debug] [MainThread]: Command `dbt show` failed at 10:58:42.109155 after 0.20 seconds
+[0m10:58:42.110182 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021D0FD050A0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021D0F455070>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x0000021D0F5E5820>]}
+[0m10:58:42.111565 [debug] [MainThread]: Flushing usage events
+[0m10:58:42.782945 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m12:42:22.925527 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002921CDD28A0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002921C4D5550>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000292200CBC20>]}
+
+
+============================== 12:42:22.929742 | a8fa108d-04e3-4818-9c12-e1ff7e79cc84 ==============================
+[0m12:42:22.929742 [info ] [MainThread]: Running with dbt=1.11.12
+[0m12:42:22.931359 [debug] [MainThread]: running dbt with arguments {'version_check': 'True', 'no_print': 'None', 'static_parser': 'True', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'target_path': 'None', 'printer_width': '80', 'write_json': 'True', 'introspect': 'True', 'log_cache_events': 'False', 'empty': 'None', 'cache_selected_only': 'False', 'log_format': 'default', 'debug': 'False', 'fail_fast': 'False', 'profiles_dir': 'C:\\Users\\DELL\\.dbt', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'partial_parse': 'True', 'use_colors': 'True', 'indirect_selection': 'eager', 'invocation_command': 'dbt show --select stg_sales --output json --limit 1', 'use_experimental_parser': 'False', 'log_path': 'logs'}
+[0m12:42:22.932361 [error] [MainThread]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path C:\Users\DELL\Desktop\python\ETL_Project_git\dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m12:42:22.934394 [debug] [MainThread]: Command `dbt show` failed at 12:42:22.934394 after 0.18 seconds
+[0m12:42:22.934394 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002921FB0AC30>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002921D782C60>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000002922045DAF0>]}
+[0m12:42:22.935395 [debug] [MainThread]: Flushing usage events
+[0m12:42:23.611027 [debug] [MainThread]: An error was encountered while trying to flush usage events

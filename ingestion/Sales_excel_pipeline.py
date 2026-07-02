@@ -7,12 +7,24 @@ import dlt
 Raw_xlsx = Path("Sources/raw_sales_export.xlsx")
 Raw_xlsx_2 = Path("Sources/raw_sales_export_v2.xlsx")
 DB_PATH = Path("warehouse/northwind.duckdb")
+
+
+def fix_mojibake(value):
+    if not isinstance(value, str):
+        return value
+    try:
+        return value.encode("cp1252").decode("utf-8").strip()
+    except (UnicodeDecodeError, UnicodeEncodeError):
+        return value.strip()
+
+
 @dlt.resource(name="sales", write_disposition="merge", primary_key=["Order ID"])
 def load_data(path, skip_rows=0):
     df = pd.read_excel(path, skiprows=skip_rows)
     df.columns = df.columns.str.strip()
     df = df.rename(columns={"Total Amount": "Amount"})
     df = df.dropna(subset=["Order ID"])
+    df["Customer Name"] = df["Customer Name"].apply(fix_mojibake)
     yield from df.to_dict(orient="records")
 
 def run_pipeline():
@@ -23,13 +35,13 @@ def run_pipeline():
         dataset_name="raw",
     )
 
-    version_before = pipeline.default_schema.version
+    version_before = pipeline.default_schema.version if pipeline.default_schema_name else 0
 
     load_info = pipeline.run([load_data(Raw_xlsx, 3), load_data(Raw_xlsx_2, 3)])
 
     version_after = pipeline.default_schema.version
     if version_after != version_before:
-        print(f"Schema changed! version {version_before} → {version_after}")
+        print(f"Schema changed! version {version_before} -> {version_after}")
         print("New or modified columns detected — check raw.sales before trusting downstream models.")
     else:
         print(f"Schema unchanged (version {version_after})")

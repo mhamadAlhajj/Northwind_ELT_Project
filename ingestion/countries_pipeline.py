@@ -25,7 +25,7 @@ def Read_Countries(path):
                     "path":"countries/v5",
                     "data_selector": "data.objects",
                 "params": {
-                    "response_fields": "names.common,names.official,region,area,continents,coordinates,currencies,population,ISO , ccn3 , subregion",
+                    "response_fields": "names.common,names.official,region,area,coordinates,currencies.code,currencies.name,currencies.symbol,continents.value,codes.alpha_3 , codes.alpha_2,population,ISO , ccn3 , subregion",
                 },
                 "paginator": {
                     "type": "offset",
@@ -43,7 +43,7 @@ def Read_Countries(path):
 
 def run_pipeline():
     """Run the data extraction pipeline."""
-    print("🚀 Starting Countries data extraction...")
+    print("Starting Countries data extraction...")
     pipeline = dlt.pipeline(
         pipeline_name="Countries_pipeline",
         destination=dlt.destinations.duckdb("warehouse/northwind.duckdb"),
@@ -52,8 +52,8 @@ def run_pipeline():
 
     Countries_source = Read_Countries(COUNTRIES)
     load_Countries_info = pipeline.run(Countries_source, write_disposition="replace")
-    print("✅ Pipeline completed successfully!")
-    print(f"📊 Load info: {load_Countries_info}")
+    print("Pipeline completed successfully!")
+    print(f"Load info: {load_Countries_info}")
     
     return load_Countries_info
 
