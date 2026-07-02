@@ -18,7 +18,34 @@ def fix_mojibake(value):
         return value.strip()
 
 
-@dlt.resource(name="sales", write_disposition="merge", primary_key=["Order ID"])
+SALES_COLUMNS = {
+    "Order ID": {"data_type": "text"},
+    "Order Date": {"data_type": "text"},
+    "Ship Date": {"data_type": "text"},
+    "Customer ID": {"data_type": "text"},
+    "Customer Name": {"data_type": "text"},
+    "Country": {"data_type": "text"},
+    "Segment": {"data_type": "text"},
+    "Product ID": {"data_type": "text"},
+    "Product Name": {"data_type": "text"},
+    "Category": {"data_type": "text"},
+    "Quantity": {"data_type": "text"},
+    "Unit Price": {"data_type": "text"},
+    "Discount": {"data_type": "text"},
+    "Amount": {"data_type": "text"},
+    "Currency": {"data_type": "text"},
+    "Sales Rep": {"data_type": "text"},
+    "Order Channel": {"data_type": "text"},
+    "Tax": {"data_type": "text"},
+}
+
+
+@dlt.resource(
+    name="sales",
+    write_disposition="merge",
+    primary_key=["Order ID"],
+    columns=SALES_COLUMNS,
+)
 def load_data(path, skip_rows=0):
     df = pd.read_excel(path, skiprows=skip_rows,dtype=str)
     df.columns = df.columns.str.strip()
