@@ -1,0 +1,25 @@
+version: 2
+sources:
+  - name: raw
+    schema: raw
+    tables:
+      - name: sales
+        description: "Sales data"
+        columns:
+          - name: order_id
+            tests:
+              - not_null
+      - name: fx_rates
+        description: "Foreign exchange rates"
+        columns:
+          - name: rate_date
+            tests:
+              - not_null
+          - name: currency
+            tests:
+              - not_null
+          - name: rate
+            tests:
+              - not_null
+      - name: countries
+        
