@@ -24,7 +24,7 @@ def Read_Countries(path):
                     "path":"countries/v5",
                     "data_selector": "data.objects",
                 "params": {
-                    "response_fields": "names.common,names.official,region,area,coordinates,currencies.code,currencies.name,currencies.symbol,continents.value,codes.alpha_3 , codes.alpha_2,population,ISO , ccn3 , subregion",
+                    "response_fields": "names.common,names.official,region,currencies.code,currencies.name,currencies.symbol,codes.alpha_3,codes.alpha_2,population,codes.ccn3,subregion",
                 },
                 "paginator": {
                     "type": "offset",

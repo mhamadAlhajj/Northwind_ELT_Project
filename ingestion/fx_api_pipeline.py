@@ -9,6 +9,8 @@ FX_BASE = "https://api.frankfurter.dev/v2/rates"
 def fx_rates_by_date(
     cursor=dlt.sources.incremental("rate_date", initial_value="2024-01-01")
 ):
+    #  The idea here is to create a new column containing the rate date, because on weekends and holidays the market is closed, 
+    #  so the actual date may return the value from the previous working day instead of the correct date I am searching for.
     end_date = date.today()
     current = date.fromisoformat(cursor.last_value)
     print(f"Starting from: {current} → up to: {end_date}")
