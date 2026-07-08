@@ -62,18 +62,12 @@ typed as (
         p.ship_date,
         p.quantity,
         try_cast(p.unit_price as decimal(10,2)) as unit_price,
-        try_cast(p.amount as decimal(10,2)) as source_amount,
+        try_cast(p.amount as decimal(10,2)) as amount,
         p.category,
         p.segment,
         p.order_channel,
         p.discount,
         p.tax,
-        cast(
-            coalesce(cast(regexp_replace(p.unit_price, '[^0-9.]', '', 'g') as decimal(10, 2)), 0.00)
-            * (1 - coalesce(p.discount, 0.00))
-            * p.quantity
-            as decimal(10, 2)
-        ) as correct_amount,
         _dlt_load_id,
         _dlt_id
     from priced p
@@ -97,7 +91,9 @@ flagged as (
                 case when unit_price    is null then 'missing_unit_price' end,
                 case when unit_price is not null and unit_price < 0 then 'invalid_unit_price' end,
                 case when order_date is not null and ship_date is not null and ship_date < order_date
-                    then 'ship_before_order' end
+                    then 'ship_before_order' end,
+                case when amount is null then 'missing_amount' end,
+                case when amount is not null and amount < 0 then 'invalid_amount' end
             ),
             ''
         ) as quarantine_reason
@@ -115,15 +111,14 @@ select
     ship_date,
     quantity,
     unit_price,
-    source_amount,
+    amount,
     category,
     segment,
     order_channel,
     discount,
     tax,
-    correct_amount,
     quarantine_reason,
     quarantine_reason is not null as is_quarantined,
     _dlt_load_id,
-    _dlt_id
+    _dlt_id 
 from flagged

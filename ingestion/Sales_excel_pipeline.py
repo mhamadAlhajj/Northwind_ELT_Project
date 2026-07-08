@@ -42,8 +42,7 @@ SALES_COLUMNS = {
 
 @dlt.resource(
     name="sales",
-    write_disposition="merge",
-    primary_key=["Order ID"],
+    write_disposition="append",
     columns=SALES_COLUMNS,
 )
 def load_data(path, skip_rows=0):
@@ -55,6 +54,9 @@ def load_data(path, skip_rows=0):
     df["Product Name"] = df["Product Name"].apply(fix_mojibake)
     df["Country"] = df["Country"].apply(fix_mojibake)
     yield from df.to_dict(orient="records")
+
+
+
 
 def run_pipeline():
     print("Starting Sales Excel pipeline...")

@@ -5,12 +5,16 @@ sources:
     tables:
       - name: sales
         description: "Sales data"
+        loaded_at_field: _dlt_load_id
+        freshness: {warn_after: {count: 6, period: hour}, error_after: {count: 12, period: hour}}
         columns:
           - name: order_id
             tests:
               - not_null
       - name: fx_rates
         description: "Foreign exchange rates"
+        loaded_at_field: _dlt_load_id
+        freshness: {warn_after: {count: 24, period: hour}, error_after: {count: 36, period: hour}}
         columns:
           - name: rate_date
             tests:
@@ -28,3 +32,4 @@ sources:
               - not_null
               - unique
       - name: countries__currencies
+      - name: _dlt_loads
