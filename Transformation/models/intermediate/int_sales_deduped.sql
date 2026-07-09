@@ -12,6 +12,7 @@ with cte_sales as (
         category,
         segment,
         order_channel,
+        country,
         discount,
         tax,
         quarantine_reason,
@@ -34,5 +35,6 @@ select *
 from (
 select * , row_number() over (partition by order_id , quantity order by loaded_date desc) as rn
 from cte_join
+where is_quarantined = false
 )
 where rn = 1
