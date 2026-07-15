@@ -1,5 +1,5 @@
 with cte_sales as (
-    select  distinct order_id,
+    select distinct order_id,
         customer_id,
         customer_name,
         product_id,
@@ -33,6 +33,8 @@ cte_join as (
 )
 select * 
 from (
+-- The purpose of the row number here is to remove duplicates when the same order ID and product id appears more than once.
+-- This duplication may occur because the same order was loaded late or due to a data loading issue.
 select * , row_number() over (partition by order_id ,product_id, sign(quantity) order by loaded_date desc) as rn
 from cte_join
 where is_quarantined = false

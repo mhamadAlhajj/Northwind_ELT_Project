@@ -2,34 +2,47 @@ version: 2
 sources:
   - name: raw
     schema: raw
+    description: "Raw Northwind data landed as-is by dlt, with no cleaning, typing, or business logic applied. This is the untouched extract/load layer that staging models build on top of."
     tables:
       - name: sales
-        description: "Sales data"
+        description: "Raw sales line-item export ingested by dlt (one row per order/product line), straight from the source export file before any parsing, typing, or quarantine logic is applied in stg_sales."
         loaded_at_field: _dlt_load_id
         freshness: {warn_after: {count: 6, period: hour}, error_after: {count: 12, period: hour}}
         columns:
           - name: order_id
+            description: "Raw order identifier as it appears in the source export, before regex-cleaning/casting to int in stg_sales."
+            tests:
+              - not_null
+          - name: product_id
+            description: "Raw product identifier as it appears in the source export, before regex-cleaning/casting to int in stg_sales."
             tests:
               - not_null
       - name: fx_rates
-        description: "Foreign exchange rates"
+        description: "Daily foreign exchange rates per currency, used downstream in int_sales_conformed to convert local-currency sales amounts to USD."
         loaded_at_field: _dlt_load_id
         freshness: {warn_after: {count: 24, period: hour}, error_after: {count: 36, period: hour}}
         columns:
           - name: rate_date
+            description: "Date the exchange rate applies to; matched against order_date to pick the most recent rate available at order time."
             tests:
               - not_null
           - name: currency
+            description: "Currency code (e.g. USD, EUR) the rate is quoted for."
             tests:
               - not_null
           - name: rate
+            description: "Exchange rate used to convert an amount in this currency to USD (amount_usd = amount / rate)."
             tests:
               - not_null
       - name: countries
+        description: "ISO country reference data (common/official names, alpha-2/alpha-3/numeric codes, region), used to map raw country strings in sales to standardized ISO codes and to look up each country's currencies."
         columns:
           - name: names__common
+            description: "Country's common name, used as a fallback match key for territories that don't have an ISO alpha-2 code (e.g. Somaliland)."
             tests:
               - not_null
               - unique
       - name: countries__currencies
+        description: "Currency codes, names, and symbols nested under each country (one or more rows per country), unnested by dlt from the countries source into a child table."
       - name: _dlt_loads
+        description: "dlt-managed load metadata, one row per pipeline run. Used to get the loaded_at timestamp for handling late-arriving/duplicate loads in int_sales_deduped."

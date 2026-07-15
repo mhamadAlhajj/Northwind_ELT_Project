@@ -1,0 +1,37 @@
+version: 2
+
+macros:
+  - name: date_transformation
+    description: "Parses a raw date column that arrives in several inconsistent formats (native date/timestamp, MM/DD/YYYY, 'DD Mon YYYY', or an Excel serial-date integer) and coalesces them into a single date. Returns null if none of the formats match, so the row can be flagged by quarantine logic downstream."
+    arguments:
+      - name: column_name
+        type: string
+        description: "Name of the raw date column to parse (e.g. 'order_date', 'ship_date')."
+
+  - name: normalize_decimal_separator
+    description: "Detects whether a numeric string uses ',' or '.' as the decimal separator (vs. a thousands separator) and rewrites it to a consistent '.' decimal format, so the value can be safely cast to a number afterwards. Needed because the source export mixes US and European numeric formats."
+    arguments:
+      - name: column_name
+        type: string
+        description: "Name of the raw numeric-as-string column to normalize (e.g. 'unit_price', 'amount')."
+
+  - name: percentage_transformation
+    description: "Converts a raw percentage value into a decimal fraction — handles values written with a literal '%' sign as well as plain numbers, and defaults to 0.00 when the value is null."
+    arguments:
+      - name: column_name
+        type: string
+        description: "Name of the raw percentage column to convert (e.g. 'discount', 'tax')."
+
+  - name: map_country_code
+    description: "Maps a raw country name/abbreviation string to its ISO alpha-2 code. A handful of disputed territories without an ISO alpha-2 code (e.g. Somaliland) are mapped to their literal name instead so they can still match stg_countries by common_name. Returns null for any unrecognized value, so stg_sales can flag that row with a missing_country quarantine reason."
+    arguments:
+      - name: column_name
+        type: string
+        description: "Name of the raw country column to map (e.g. 'country')."
+
+  - name: map_segment
+    description: "Normalizes raw, sometimes-abbreviated customer segment values (e.g. 'corp', 'homeoffice') to their full segment label. Passes the value through unchanged if it isn't one of the known abbreviations."
+    arguments:
+      - name: column_name
+        type: string
+        description: "Name of the raw segment column to normalize (e.g. 'segment')."

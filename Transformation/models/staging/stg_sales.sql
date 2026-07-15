@@ -1,20 +1,20 @@
 with parsed as (
 
     select
-        regexp_replace(order_id, '[^0-9]', '', 'g') as order_id,
-        regexp_replace(customer_id, '[^0-9]', '', 'g') as customer_id,
-        trim(customer_name) as customer_name,
-        regexp_replace(product_id, '[^0-9]', '', 'g') as product_id,
-        trim(coalesce(lower(product_name), 'unknown')) as product_name,
-        coalesce(trim(country) , 'unknown') as country,
+        regexp_replace(order_id, '[^A-Za-z0-9]', '', 'g') as order_id,
+        regexp_replace(customer_id, '[^A-Za-z0-9]', '', 'g') as customer_id,
+        coalesce(lower(trim(customer_name) , 'unknown')) as customer_name,
+        regexp_replace(product_id, '[^A-Za-z0-9]', '', 'g') as product_id,
+        coalesce(trim(lower(product_name), 'unknown')) as product_name,
+        {{map_country_code('country')}} as country,
         {{date_transformation('order_date')}} as order_date,
         {{date_transformation('ship_date')}} as ship_date,
         cast(quantity as int) as quantity,
         {{ normalize_decimal_separator('unit_price') }} as unit_price_normalized,
         {{ normalize_decimal_separator('amount') }} as amount,
-        coalesce(lower(trim(regexp_replace(category, '[^a-zA-Z ]', '', 'g'))), 'unknown') as category,
-        coalesce(lower(trim(regexp_replace(segment, '[^a-zA-Z ]', '', 'g'))), 'unknown') as segment,
-        coalesce(lower(trim(regexp_replace(order_channel, '[^a-zA-Z ]', '', 'g'))), 'unknown') as order_channel,
+        {{clean_text('category')}}  as category,
+        {{clean_text('segment')}}  as segment,
+        {{clean_text('order_channel')}}  as order_channel,
         {{ percentage_transformation('discount') }} as discount,
         {{ percentage_transformation('tax') }} as tax,
         _dlt_load_id,
@@ -43,7 +43,7 @@ priced as (
         ) as unit_price,
         amount,
         category,
-        segment,
+        {{map_segment('segment')}} as segment,
         order_channel,
         discount,
         tax,
@@ -96,7 +96,8 @@ flagged as (
                 case when order_date is not null and ship_date is not null and ship_date < order_date
                     then 'ship_before_order' end,
                 case when amount is null then 'missing_amount' end,
-                case when amount is not null and amount < 0 then 'invalid_amount' end
+                case when amount is not null and amount < 0 then 'invalid_amount' end,
+                case when country is null then 'missing_country' end
             ),
             ''
         ) as quarantine_reason

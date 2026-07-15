@@ -1,0 +1,63 @@
+version: 2
+
+models:
+  - name: stg_sales
+    description: "Cleaned and typed sales line items, one row per raw sales line. Regex-cleans and casts IDs, applies date/decimal/percentage parsing macros, maps country and segment to standardized values, forward-fills missing unit_price per product from the last known price, and flags data-quality issues via quarantine_reason/is_quarantined rather than dropping rows."
+    columns:
+      - name: order_id
+        description: "Order identifier, regex-cleaned to digits only and cast to int."
+      - name: product_id
+        description: "Product identifier, regex-cleaned to digits only and cast to int."
+      - name: order_date
+        description: "Order date, parsed from the raw source format via the date_transformation macro."
+      - name: ship_date
+        description: "Ship date, parsed from the raw source format via the date_transformation macro."
+      - name: unit_price
+        description: "Unit price, forward-filled per product from the most recent non-null prior value (by order_date) when missing in the raw export."
+      - name: segment
+        description: "Customer segment, normalized to lowercase and mapped via the segment_mapping macro; falls back to 'unknown' when missing."
+        tests:
+          - accepted_values:
+              values: ['consumer','home office','unknown','corporate']
+      - name: category
+        description: "Product category, normalized to lowercase; falls back to 'unknown' when missing."
+        tests:
+          - accepted_values:
+              values: ['furniture','office supplies','technology','unknown']
+      - name: order_channel
+        description: "Channel the order was placed through, normalized to lowercase; falls back to 'unknown' when missing."
+        tests:
+          - accepted_values:
+              values: ['online','partner','retail','unknown']
+      - name: quarantine_reason
+        description: "Comma-separated list of data-quality issues detected on this row (e.g. missing_order_id, invalid_quantity, ship_before_order). Null when the row is clean."
+      - name: is_quarantined
+        description: "True if quarantine_reason is non-null. Downstream models (e.g. int_sales_deduped) filter on this to exclude bad rows while keeping them visible here for inspection."
+
+  - name: stg_countries
+    description: "Cleaned ISO country reference data, one row per country, with its currency codes/names/symbols nested from countries__currencies. Used by int_sales_conformed to map a sales row's country to a currency for FX conversion."
+    columns:
+      - name: common_name
+        description: "Country's common name; used as a fallback match key (via coalesce with alpha_2) for territories without an ISO alpha-2 code."
+      - name: alpha_2
+        description: "ISO 3166-1 alpha-2 country code. Empty string for disputed territories that don't have one (e.g. Somaliland)."
+      - name: currency_codes
+        description: "List of currency codes used by this country, used to join to stg_fx for exchange rate lookup."
+      - name: quarantine_reason
+        description: "Comma-separated list of missing reference fields (e.g. missing_alpha_2, missing_currency). Null when the row is clean."
+      - name: is_quarantined
+        description: "True if quarantine_reason is non-null."
+
+  - name: stg_fx
+    description: "Cleaned daily foreign exchange rates, one row per currency/date. Casts raw fields and flags missing or non-positive rates via quarantine_reason so they're excluded from FX conversion downstream rather than silently dividing by a bad rate."
+    columns:
+      - name: rate_date
+        description: "Date the exchange rate applies to."
+      - name: currency
+        description: "Currency code the rate is quoted for."
+      - name: rate
+        description: "Exchange rate to convert an amount in this currency to USD. Flagged invalid_rate if <= 0."
+      - name: quarantine_reason
+        description: "Comma-separated list of data-quality issues (missing_rate_date, missing_currency, missing_base, missing_rate, invalid_rate). Null when the row is clean."
+      - name: is_quarantined
+        description: "True if quarantine_reason is non-null. int_sales_conformed only joins against rows where this is false."

@@ -1,0 +1,28 @@
+version: 2
+
+models:
+  - name: int_sales_deduped
+    description: "Deduplicated sales lines: joins stg_sales to dlt load metadata to get each row's loaded_date, drops quarantined rows (is_quarantined = false), and keeps only the most-recently-loaded row per (order_id, product_id, sign(quantity)) — the grain that distinguishes a sale from a return for the same order/product."
+    columns:
+      - name: order_id
+        description: "Order identifier, inherited from stg_sales."
+      - name: product_id
+        description: "Product identifier, inherited from stg_sales."
+      - name: loaded_date
+        description: "Timestamp the row's dlt load batch was inserted, used both to resolve duplicates (most recent wins) and as the incremental watermark for downstream models."
+      - name: rn
+        description: "Row number within each (order_id, product_id, sign(quantity)) group, ordered by loaded_date desc. Only rn = 1 (the latest load) survives into the final output."
+
+  - name: int_sales_conformed
+    description: "Sales lines converted to USD and conformed to a single grain. Joins int_sales_deduped to stg_countries and stg_fx to look up each row's currency and the most recent exchange rate available before the order date, computes amount_usd, and re-flags rows with a missing country mapping or missing rate via quarantine_reason. Incremental (delete+insert) on order_line_id, keyed on the same (order_id, product_id, sign(quantity)) grain as int_sales_deduped so late corrections re-land on the same key instead of duplicating."
+    columns:
+      - name: order_line_id
+        description: "Unique key for this model: order_id || '-' || product_id || '-' || sign(quantity). Same grain as int_sales_deduped's dedup partition, by design."
+      - name: rate
+        description: "Exchange rate used for this row, picked as the most recent stg_fx rate on or before order_date for the row's currency (via qualify row_number() ... = 1)."
+      - name: amount_usd
+        description: "amount converted to USD: amount / rate. Null when rate could not be resolved (e.g. missing country mapping or missing FX rate)."
+      - name: quarantine_reason
+        description: "Comma-separated list of conformance issues (missing_country_mapping, missing_rate). Null when the row converted cleanly."
+      - name: is_quarantined
+        description: "True if quarantine_reason is non-null."

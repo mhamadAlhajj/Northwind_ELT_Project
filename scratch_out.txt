@@ -1,0 +1,36 @@
+--- customer_id with multiple names (top 15) ---
+    customer_id  n_names                                                                  names
+0             8        5  [Müller GmbH, Café Ölsson, Zen Trading, zen  trading, O'Brien & Sons]
+1             2        5   [Zen Trading, ACME RETAIL, Soluções Norte, Café Ölsson, Müller GmbH]
+2             6        4               [zen  trading, Café Ölsson, Acme Retail, O'Brien & Sons]
+3             5        4                [Zen Trading, O'Brien & Sons, Café Ölsson, Globex Corp]
+4          1008        4             [O'Brien & Sons, Acme Retail, Café Ölsson, Soluções Norte]
+5             9        3                                       [Zen Trading, Müller GmbH, 北京商贸]
+6          1001        3                             [Café Ölsson, Globex Corp, Soluções Norte]
+7          1004        3                                       [Café Ölsson, 北京商贸, ACME RETAIL]
+8          1007        3                             [Globex Corp, ACME RETAIL, Soluções Norte]
+9             4        3                                [globex corp, Zen Trading, Café Ölsson]
+10            7        3                                    [Café Ölsson, 北京商贸, Soluções Norte]
+11            1        3                                [Café Ölsson, ACME RETAIL, Müller GmbH]
+12         1002        3                             [Acme Retail, Soluções Norte, Café Ölsson]
+13         1006        2                                             [Müller GmbH, Zen Trading]
+14         1003        2                                                    [北京商贸, ACME RETAIL]
+
+total customer_ids with >1 name: 16
+
+--- customer_name with multiple ids (top 15) ---
+    customer_name  n_ids                                            ids
+0     Café Ölsson     11  [4, 2, 1001, 1002, 5, 1004, 1008, 8, 6, 1, 7]
+1     Zen Trading      7                       [2, 3, 8, 9, 5, 1006, 4]
+2  Soluções Norte      6                 [1007, 7, 2, 1001, 1008, 1002]
+3     Müller GmbH      6                          [2, 3, 8, 9, 1006, 1]
+4     ACME RETAIL      5                       [2, 1004, 1007, 1003, 1]
+5            北京商贸      4                             [7, 1003, 1004, 9]
+6     Acme Retail      4                          [1008, 6, 1002, 1005]
+7  O'Brien & Sons      4                                [6, 1008, 8, 5]
+8     Globex Corp      3                                [5, 1001, 1007]
+9    zen  trading      2                                         [6, 8]
+
+total customer_names with >1 id: 10
+total distinct customer_id: 17
+total distinct customer_name: 11
