@@ -3,7 +3,7 @@ with parsed as (
     select
         regexp_replace(order_id, '[^A-Za-z0-9]', '', 'g') as order_id,
         regexp_replace(customer_id, '[^A-Za-z0-9]', '', 'g') as customer_id,
-        coalesce(lower(trim(customer_name) , 'unknown')) as customer_name,
+        coalesce(lower(trim(regexp_replace(customer_name,'\s+',' ','g'))) , 'unknown') as customer_name,
         regexp_replace(product_id, '[^A-Za-z0-9]', '', 'g') as product_id,
         coalesce(trim(lower(product_name), 'unknown')) as product_name,
         {{map_country_code('country')}} as country,

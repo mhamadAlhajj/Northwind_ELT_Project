@@ -5,8 +5,8 @@ with RECURSIVE date_series as (
     select dt + INTERVAL '1 day'
     from date_series
     where dt < (select max(order_date) + INTERVAL '5 year' as max_date
-    from {{ref('stg_sales')}})
-    where order_date is not null
+    from {{ref('stg_sales')}}
+    where order_date is not null)
 )
 select 
     dt as date_key,
