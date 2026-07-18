@@ -1,7 +1,38 @@
-select distinct customer_id ,customer_name ,order_date, First_Value(order_date) over(partition by customer_id , customer_name order by order_date) as valid_From ,
- coalesce((select order_date  from {{ref('stg_sales')}} ss2 where ss2.customer_id = ss.customer_id and ss2.customer_name != ss.customer_name and ss2.order_date > ss.order_date order by order_date limit 1),'9999-12-31') as valid_to
-from {{ref('stg_sales')}} ss 
---where customer_id= 1001
---  is_quarantined = false
-order by customer_id
--- coalesce((last_value(order_date) over (partition by customer_id , customer_name order by order_date rows between 1 following and unbounded following)),'9999-12-31')
+with lag_table as (
+    select 
+        customer_id,
+        customer_name,
+        country,
+        segment,
+        order_date,
+        LAG(customer_name) over (partition by customer_id order by order_date) as previous_Name,
+        LAG(country) over (partition by customer_id order by order_date) as previous_country,
+        LAG(segment) over (partition by customer_id order by order_date) as previous_segment
+    from {{ref('stg_sales')}}
+),
+check_Change as (
+    select 
+        customer_id,
+        customer_name,
+        country,
+        segment,
+        order_date as valid_from
+    from lag_table 
+    where 
+        previous_Name is null 
+        or customer_name is distinct from previous_Name
+        or country is distinct from previous_country
+        or segment is distinct from previous_segment
+),
+add_valid_To as (
+    select * , 
+        lead(valid_from) over (partition by customer_id order by valid_from) as valid_to,
+    from check_Change
+)
+select * ,
+    concat(customer_id, '-', valid_from) as Customer_surrogate_id,
+    case 
+        when valid_to is null then 'yes'
+        else 'no'
+    End as is_current
+from add_valid_To
