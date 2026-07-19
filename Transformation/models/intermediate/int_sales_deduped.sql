@@ -37,6 +37,6 @@ from (
 -- This duplication may occur because the same order was loaded late or due to a data loading issue.
 select * , row_number() over (partition by order_id ,product_id, sign(quantity) order by loaded_date desc) as rn
 from cte_join
-where is_quarantined = false
+--where is_quarantined = false
 )
 where rn = 1
