@@ -417,19 +417,3 @@ schema state lives in *two* places — `~/.dlt/pipelines/<name>/` and inside Duc
 forever; both have to go.
 
 ---
-
-## Known gaps
-
-- **No dashboard.** Evidence was the intended BI layer and is not built.
-- **No margin.** No cost data in the source — left as a documented gap rather than an invented
-  number.
-- **No `.yml` for the marts.** The staging and intermediate layers are documented and tested;
-  the marts models currently have neither descriptions nor tests on their keys.
-- **`dim_geography` and `dim_currency` are not separate dimensions.** Region and currency are
-  carried on the conformed fact and on `dim_customer` instead. Fine at this scale, but not a
-  textbook star.
-- **No `PROFILING.md`.** The exploration lives in `checking_data/` as scripts rather than as a
-  written data contract.
-- **The country mapping is a hand-written macro.** It covers the eight countries in this
-  dataset; a ninth country in a future export lands in quarantine until the macro is updated.
-  `checking_country.sql` is the test that tells me that happened.
