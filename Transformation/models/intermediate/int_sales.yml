@@ -14,12 +14,12 @@ models:
         description: "Row number within each (order_id, product_id, sign(quantity)) group, ordered by loaded_date desc. Only rn = 1 (the latest load) survives into the final output."
 
   - name: int_sales_conformed
-    description: "Sales lines converted to USD and conformed to a single grain. Joins int_sales_deduped to stg_countries and stg_fx to look up each row's currency and the most recent exchange rate available before the order date, computes amount_usd, and re-flags rows with a missing country mapping or missing rate via quarantine_reason. Incremental (delete+insert) on order_line_id, keyed on the same (order_id, product_id, sign(quantity)) grain as int_sales_deduped so late corrections re-land on the same key instead of duplicating."
+    description: "Sales lines converted to USD and conformed to a single grain. Joins int_sales_deduped to stg_countries and stg_fx to look up each row's currency and its exchange rate on the order date, computes amount_usd, and re-flags rows with a missing country mapping or missing rate via quarantine_reason. The FX join is a plain equi-join on rate_date = order_date because the FX loader stores a row for every calendar date (a weekend row carries the previous working day's rate), so there are no gaps to work around. Incremental (delete+insert) on order_line_id, keyed on the same (order_id, product_id, sign(quantity)) grain as int_sales_deduped so late corrections re-land on the same key instead of duplicating."
     columns:
       - name: order_line_id
         description: "Unique key for this model: order_id || '-' || product_id || '-' || sign(quantity). Same grain as int_sales_deduped's dedup partition, by design."
       - name: rate
-        description: "Exchange rate used for this row, picked as the most recent stg_fx rate on or before order_date for the row's currency (via qualify row_number() ... = 1)."
+        description: "Exchange rate used for this row: the stg_fx rate whose rate_date equals order_date, for the row's currency. The qualify row_number() ... = 1 is there to keep one row per source row when a country lists more than one currency, not to pick a date."
       - name: amount_usd
         description: "amount converted to USD: amount / rate. Null when rate could not be resolved (e.g. missing country mapping or missing FX rate)."
       - name: quarantine_reason

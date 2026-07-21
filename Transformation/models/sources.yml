@@ -23,7 +23,7 @@ sources:
         freshness: {warn_after: {count: 24, period: hour}, error_after: {count: 36, period: hour}}
         columns:
           - name: rate_date
-            description: "Date the exchange rate applies to; matched against order_date to pick the most recent rate available at order time."
+            description: "The date the rate was requested for, matched directly against order_date downstream. Populated for every calendar date, so weekends and holidays have a row too (carrying the previous working day's rate, whose real date is kept in actual_date)."
             tests:
               - not_null
           - name: currency

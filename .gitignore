@@ -1,6 +1,6 @@
 .env
-northwind_de_project.ipynb
 CLAUDE.md
 warehouse/*.duckdb
 warehouse/duckdb
 /.dlt
+*.txt
