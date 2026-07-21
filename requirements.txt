@@ -1,0 +1,14 @@
+# Extract & load
+dlt[duckdb]==1.28.1
+pandas==3.0.3
+openpyxl==3.1.5         
+requests==2.32.4
+python-dotenv==1.2.1    
+
+# Warehouse & transform
+duckdb==1.5.4
+dbt-core==1.11.12
+dbt-duckdb==1.10.1
+
+# Only used by the profiling scripts in checking_data/
+rapidfuzz==3.14.5

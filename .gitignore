@@ -4,3 +4,5 @@ warehouse/*.duckdb
 warehouse/duckdb
 ingestion/.dlt/secrets.toml
 *.txt
+!requirements.txt
+!**/requirements.txt

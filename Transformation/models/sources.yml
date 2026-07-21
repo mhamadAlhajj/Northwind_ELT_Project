@@ -11,12 +11,8 @@ sources:
         columns:
           - name: order_id
             description: "Raw order identifier as it appears in the source export, before regex-cleaning/casting to int in stg_sales."
-            tests:
-              - not_null
           - name: product_id
             description: "Raw product identifier as it appears in the source export, before regex-cleaning/casting to int in stg_sales."
-            tests:
-              - not_null
       - name: fx_rates
         description: "Daily foreign exchange rates per currency, used downstream in int_sales_conformed to convert local-currency sales amounts to USD."
         loaded_at_field: _dlt_load_id

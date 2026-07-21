@@ -8,6 +8,97 @@ The interesting part of this project is not the tools — it's the decisions. Al
 below exists because of a specific problem in the data, and this README is mostly about *why*
 each one is built the way it is.
 
+note : *`README.md` and `run_pipeline.py` were written by Claude.*
+---
+
+## Getting started
+
+### 1. Install the libraries
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate        # Windows   (macOS/Linux: source .venv/bin/activate)
+pip install -r requirements.txt
+```
+
+### 2. Add the API key
+
+The REST Countries v5 endpoint needs a free key. Create a `.env` file in the project root:
+
+```
+api_key=your_key_here
+```
+
+It's gitignored, so it never leaves your machine. The other two sources need no key.
+
+### 3. Create `profiles.yml`
+
+`dbt_project.yml` (in `Transformation/`) names the profile `DBT_ETL`, but a profile is
+connection info — not something dbt lets you commit to the repo. It has to live outside the
+project, in `~/.dbt/profiles.yml` (on Windows: `C:\Users\<you>\.dbt\profiles.yml`). If that
+file or the `DBT_ETL` entry in it doesn't exist, `dbt build`/`dbt debug` fails immediately with
+"could not find profile named DBT_ETL".
+
+Create the file with this content:
+
+```yaml
+DBT_ETL:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: "../warehouse/northwind.duckdb"
+      schema: "main"
+```
+
+- `DBT_ETL` must match the `profile:` value in `dbt_project.yml`.
+- `target: dev` picks which output block below it to use — only `dev` is defined here.
+- `type: duckdb` needs the `dbt-duckdb` adapter, which is already in `requirements.txt`.
+- `path` is relative to wherever dbt is invoked from, which is the `Transformation/` folder
+  — that's why it climbs one level up (`../warehouse/...`) to reach the database at the repo
+  root.
+- `schema: "main"` is the default dbt schema; the actual per-layer schemas (`stg`, `int`,
+  `marts`) are set in `dbt_project.yml` and override it per layer.
+
+If `~/.dbt/` doesn't exist yet, create it first — dbt won't create it for you.
+
+### 4. Run it
+
+```bash
+python run_pipeline.py
+```
+
+That one file does all four steps in order — the three dlt loads, then `dbt build`. It has to
+be run **from the project root**, because the ingestion scripts look for `Sources/` and
+`warehouse/` relative to it. If any step fails the script stops there, so dbt never builds
+models on top of a broken load.
+
+The database is created on the first run at `warehouse/northwind.duckdb` (gitignored, so you
+always build your own).
+
+### Running the pieces on their own
+
+```bash
+python ingestion/fx_api_pipeline.py   # reload one source
+
+cd Transformation
+dbt build                             # models + tests, no reloading
+dbt build --full-refresh              # rebuild int_sales_conformed from scratch
+dbt test                              # tests only
+dbt docs generate && dbt docs serve   # the lineage graph
+```
+
+`dbt build` is the one to use day to day rather than `dbt run` — it runs the models *and* their
+tests together, so a model that fails a test stops its own downstream models instead of quietly
+passing bad numbers along to the marts.
+
+### If a dlt pipeline gets stuck
+
+If a load keeps repeating `Table does not exist` or `Cannot coerce NULL` on every run, its
+schema state lives in *two* places — `~/.dlt/pipelines/<name>/` and inside DuckDB
+(`raw._dlt_version`, `raw._dlt_loads`). Clearing only one of them makes the error repeat
+forever; both have to go.
+
 ---
 
 ## The business problem
@@ -380,6 +471,8 @@ its own history. Building both and understanding why one is wrong here was the p
 ## Project layout
 
 ```
+run_pipeline.py     runs the whole thing, start to finish
+requirements.txt    every library the project needs
 ingestion/          dlt pipelines — one per source
   Sales_excel_pipeline.py     Excel v1 + v2, all columns as text, drift fixed at load
   fx_api_pipeline.py          Frankfurter, incremental + merge on (rate_date, currency)
@@ -395,25 +488,3 @@ Transformation/     the dbt project
   tests/               singular tests
   snapshots/           customer_snapshot (learning exercise, not in the DAG)
 ```
-
-## Running it
-
-```bash
-python ingestion/Sales_excel_pipeline.py
-python ingestion/fx_api_pipeline.py
-python ingestion/countries_pipeline.py
-
-cd Transformation
-dbt build          # runs models + tests
-dbt docs generate  # lineage graph
-```
-
-Requires a `.env` with the REST Countries `api_key`, and a `profiles.yml` for the `DBT_ETL`
-profile pointing at `warehouse/northwind.duckdb`. Both are gitignored.
-
-If a dlt pipeline gets stuck repeating `Table does not exist` or `Cannot coerce NULL`, its
-schema state lives in *two* places — `~/.dlt/pipelines/<name>/` and inside DuckDB
-(`raw._dlt_version`, `raw._dlt_loads`). Clearing only one of them makes the error repeat
-forever; both have to go.
-
----

@@ -4,7 +4,7 @@ with base as (
         customer_id,
         customer_name,
         country,
-        common_name,
+        country_name,
         segment,
         order_date
     from {{ ref('int_sales_conformed') }}
