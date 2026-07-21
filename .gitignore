@@ -2,5 +2,5 @@
 CLAUDE.md
 warehouse/*.duckdb
 warehouse/duckdb
-/.dlt
+ingestion/.dlt
 *.txt
